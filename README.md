@@ -24,6 +24,7 @@ It is built for two audiences at once:
 - Stores briefings in PostgreSQL so user-facing reads stay fast and stable
 - Serves the latest stored briefing through `/지금브리핑`
 - Exposes `/서버설정` for interactive server configuration
+- Exposes `/도움말` for basic usage guidance
 - Exposes `/핑` for bot health and latency checks
 - Delivers stored briefings automatically to each server's configured channel and time
 - Records structured audit logs for important user actions and configuration changes
@@ -76,6 +77,18 @@ What authorized users can change:
 - `🧩 관심 분야 설정`
 
 The command is visible to everyone in the server, but modification actions are restricted to users with `Manage Server` or `Administrator`.
+
+### `/도움말`
+
+Shows basic usage guidance for New2Signal.
+
+It explains:
+
+- how to view the latest briefing
+- how to check or modify server settings
+- default configuration values
+- permission requirements for changing settings
+- the informational nature of the service
 
 ### `/핑`
 
@@ -246,6 +259,7 @@ Current integration includes:
 - category changes
 - channel changes
 - permission-denied server-settings modification attempts
+- `/도움말` usage checks
 - `/핑` health checks
 
 Audit logging is intentionally fail-safe. Logging failures do not break the primary bot interaction.
