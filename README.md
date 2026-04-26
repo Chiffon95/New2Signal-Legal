@@ -19,7 +19,7 @@ It is built for two audiences at once:
 
 - Collects market-relevant news from configured RSS feeds
 - Normalizes, filters, and deduplicates articles before briefing generation
-- Classifies news with rule-based logic and optional LLM support
+- Classifies articles primarily with LLM-based classification, with a lightweight rule-based fallback for failures or invalid outputs
 - Generates a Korean daily market briefing with a single briefing-generation LLM step
 - Stores briefings in PostgreSQL so user-facing reads stay fast and stable
 - Serves the latest stored briefing through `/지금브리핑`
@@ -33,6 +33,8 @@ It is built for two audiences at once:
 
 - Stored briefing model:
   user-facing commands read from the database, not from live RSS or live LLM generation
+- LLM-first classification:
+  the normal path uses LLM category assignment, while rule-based classification is retained only as an operational safety fallback
 - Interactive Discord UX:
   buttons, selects, pagination, and modal-based configuration flows
 - Per-guild delivery settings:
@@ -76,6 +78,21 @@ What authorized users can change:
 - `🔔 알림 ON/OFF`
 - `🧩 관심 분야 설정`
 
+Interest-category browsing and selection support:
+
+- 전체
+- 경제
+- 증시
+- AI
+- 반도체
+- 기술
+- 기업·실적
+- 금리·환율
+- 에너지
+- 부동산
+- 정책/정치
+- 글로벌
+
 The command is visible to everyone in the server, but modification actions are restricted to users with `Manage Server` or `Administrator`.
 
 ### `/도움말`
@@ -112,6 +129,7 @@ New2Signal uses Discord-native UI components rather than forcing users through f
 - briefing time uses a real `discord.ui.Modal`
 - briefing channel selection uses a dropdown of valid text channels
 - category selection uses a select menu
+- category browsing supports finer market segmentation such as semiconductor, earnings, rates/FX, energy, and real estate
 
 ### Interaction Safety
 
@@ -129,8 +147,8 @@ RSS fetch
 -> normalize
 -> filter by briefing coverage date
 -> deduplicate
--> rule classification
 -> LLM classification
+-> rule fallback only if needed
 -> LLM briefing generation
 -> store in PostgreSQL
 -> /지금브리핑 and scheduled delivery read from DB
@@ -156,8 +174,8 @@ The production pipeline keeps the Discord read path lightweight while allowing r
 - RSS ingestion gathers candidate articles from configured feeds
 - normalization and filtering constrain the dataset to the intended briefing coverage window
 - deduplication removes overlapping headlines and repeated feed entries
-- rule classification handles deterministic category assignments
-- optional LLM classification improves article labeling when configured
+- LLM classification is the primary article-classification path
+- rule-based classification is retained only as an operational safety fallback for disabled LLMs, request failures, or invalid category outputs
 - a single LLM briefing-generation step produces the final curated briefing content
 - full classified article context remains available for category and market-news browsing
 
@@ -284,6 +302,19 @@ That includes:
 - changing briefing time
 - toggling alerts
 - changing interest categories
+
+Category selection is designed for market-oriented browsing and can cover:
+
+- economy
+- stocks
+- AI
+- semiconductor
+- earnings
+- rates/FX
+- energy
+- real estate
+- politics
+- global
 
 ### Public vs private responses
 
